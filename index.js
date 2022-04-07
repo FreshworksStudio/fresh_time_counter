@@ -63,7 +63,7 @@ const theView = (coworkers, channelId) => ({
       },
       label: {
         type: 'plain_text',
-        text: 'Peope who did not check in Today',
+        text: 'People who did not check in Today',
         emoji: true,
       },
     },
