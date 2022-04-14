@@ -1,6 +1,3 @@
-
-35 10 * * 1-5 node test.js > /proc/1/fd/1 2>/proc/1/fd/2
-# At 00:00 on every day-of-week from Monday through Friday
-
-# 54 21 * * * python3 /__init__.py  > /proc/1/fd/1 2>/proc/1/fd/2
+*/2 * * * * /usr/local/bin/node  /usr/src/app/hackthon.js  > /proc/1/fd/1 2>/proc/1/fd/2
+# 35 10 * * 1-5 root node hackthon.js  > /proc/1/fd/1 2>/proc/1/fd/2
 # Mandatory blank line -- Note: deployment server is 7 hours ahead (so run at 4am)
