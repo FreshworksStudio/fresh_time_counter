@@ -7,7 +7,7 @@ const { App, ExpressReceiver } = require('@slack/bolt');
 const { arrayToDic } = require('./util');
 
 // config
-require('dotenv').config({ path: '/usr/src/app/.env' });
+require('dotenv').config({ path:'/usr/src/app/.env'});
 const API_TOKEN = process.env.API_TOKEN;
 const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
@@ -23,6 +23,13 @@ const config = {
     'Content-Type': 'application/x-www-form-urlencoded',
   },
 };
+const humiConfig = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Bearer ${HUMI_API_TOKEN}`
+    },
+  };
+
 const expressReceiver = new ExpressReceiver({
   signingSecret: SLACK_SIGNING_SECRET,
 });
@@ -32,10 +39,10 @@ const expressReceiver = new ExpressReceiver({
  */
 
 (async () => {
-  const app = new App({
+   const app = new App({
     token: SLACK_BOT_TOKEN,
     receiver: expressReceiver,
-  });
+   });
 
   // await ack();
   const allUsers = await getAllUsers();
@@ -51,35 +58,36 @@ const expressReceiver = new ExpressReceiver({
     realName: allUsersDic[userId].profile.real_name,
   }));
 
-  const employeesJSON = require('./hackthon/employees.json');
+
   const humiEmployees = await getHumiEmployeesList();
-  const timeOffUsersJSON = require('./hackthon/timeoff.json');
-  const timeOffUsersList = await getHumiEmployeeTimeOffList();
+
+  const timeOffUsersList = await getHumiEmployeeTimeOffList(startDate,endDate);
 
   // Functions to get the employee and timeOffUsers data
   // Should be applied to the actual API data
   const employees = humiEmployees.map((element) => {
     const employee = element['attributes'];
-    ({ id, legal_first_name, legal_last_name } = employee);
+
+    const { id, legal_first_name, legal_last_name } = employee;
     return { id, legal_first_name, legal_last_name };
   });
-
+console.log('test 000',employees )
   const timeOffUsers = timeOffUsersList.map((element) => {
     const employee = element['attributes'];
-    ({ employee_id, status, start_at, end_at } = employee);
+    const { employee_id, status, start_at, end_at } = employee;
     return { employee_id, status, start_at, end_at };
   });
-
+  console.log('test1111111',timeOffUsers )
   // timeOffUsers don't have names associated with them, so we need to merge the two arrays on ID
   // Pretty messy but works, maybe can refactor later
   const timeOffUsersWithNames = timeOffUsers
     .map((element) => {
       const employeeArr = employees.filter((employee) => {
-        return employee.id === element.employee_id && status === 'approved';
+        return employee.id === element.employee_id && element.status === 'approved';
       });
       if (employeeArr.length !== 0) {
         const employeeObj = employeeArr.shift();
-        ({ legal_first_name, legal_last_name } = employeeObj);
+        const { legal_first_name, legal_last_name } = employeeObj;
         return {
           realName: `${legal_first_name} ${legal_last_name}`,
           ...element,
@@ -95,14 +103,15 @@ const expressReceiver = new ExpressReceiver({
   const humiNamesOnly = timeOffUsersWithNames.map(
     (element) => element.realName
   );
+  console.log('test 000 ', humiNamesOnly.length);
   const absentUsersList = absentUsersWithDetail.filter((element) =>
     humiNamesOnly.includes(element.realName)
   );
 
   // call helper func to eliminate all the user on vacation or on leave at here
-
+  console.log('test', absentUsersList);
   console.log('test', absentUsersWithDetail.length);
-     const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
+    /* const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
      absentUsersList.map(async (user) => {
         const text = `<@${user.value}> ${message}`;
         await app.client.chat.postMessage({
@@ -111,15 +120,16 @@ const expressReceiver = new ExpressReceiver({
           text,
         });
       });
-
+  */
 })();
 
 /** slack api */
 
 async function getAllUsers() {
-  const params = {
+ const params = {
     token: API_TOKEN,
   };
+
 
   const { data } = await axios.get(
     'https://slack.com/api/users.list',
@@ -138,6 +148,8 @@ async function getChannelUsers(channel) {
     channel,
   };
 
+
+
   const { data } = await axios.get(
     'https://slack.com/api/conversations.members',
     {
@@ -145,7 +157,6 @@ async function getChannelUsers(channel) {
     },
     config
   );
-
   return data.members;
 }
 
@@ -165,7 +176,8 @@ async function getMessages(channel) {
     latest,
     oldest,
   };
-  console.log(oldest, latest);
+
+
   const { data } = await axios.get(
     'https://slack.com/api/conversations.history',
     {
@@ -177,36 +189,32 @@ async function getMessages(channel) {
   return data.messages;
 }
 
-async function getHumiEmployeeTimeOffList() {
-  const params = {
-    token: HUMI_API_TOKEN,
+async function getHumiEmployeeTimeOffList(startDate,endDate) {
+
+
+      const params = new URLSearchParams(
+     {
     'dateRange[start]': startDate,
     'dateRange[end]': endDate,
-  };
+  });
+
 
   const { data } = await axios.get(
-    HUMI_API_URL + '/timeoff',
-    {
-      params,
-    },
-    config
+    HUMI_API_URL + `/timeoff/?${params}`,
+
+    humiConfig
   );
 
-  return data;
+  return data.data;
 }
 
 async function getHumiEmployeesList() {
-  const params = {
-    token: HUMI_API_TOKEN,
-  };
 
   const { data } = await axios.get(
     HUMI_API_URL + '/employees',
-    {
-      params,
-    },
-    config
+
+    humiConfig
   );
 
-  return data;
+  return data.data;
 }
