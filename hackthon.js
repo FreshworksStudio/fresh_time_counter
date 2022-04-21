@@ -58,8 +58,8 @@ const expressReceiver = new ExpressReceiver({
     realName: allUsersDic[userId].profile.real_name,
   }));
 
-
   const humiEmployees = await getHumiEmployeesList();
+
 
   const timeOffUsersList = await getHumiEmployeeTimeOffList(startDate,endDate);
 
@@ -68,49 +68,46 @@ const expressReceiver = new ExpressReceiver({
   const employees = humiEmployees.map((element) => {
     const employee = element['attributes'];
 
-    const { id, legal_first_name, legal_last_name } = employee;
+    const { id, legal_first_name, legal_last_name, end_date } = employee;
+     if(end_date === null)
     return { id, legal_first_name, legal_last_name };
-  });
-console.log('test 000',employees )
+     else return null;
+  }).filter((element) => element !== null);
+
+  console.log('humi employees', employees.length);
   const timeOffUsers = timeOffUsersList.map((element) => {
     const employee = element['attributes'];
     const { employee_id, status, start_at, end_at } = employee;
     return { employee_id, status, start_at, end_at };
   });
-  console.log('test1111111',timeOffUsers )
+
   // timeOffUsers don't have names associated with them, so we need to merge the two arrays on ID
   // Pretty messy but works, maybe can refactor later
-  const timeOffUsersWithNames = timeOffUsers
-    .map((element) => {
-      const employeeArr = employees.filter((employee) => {
-        return employee.id === element.employee_id && element.status === 'approved';
-      });
-      if (employeeArr.length !== 0) {
-        const employeeObj = employeeArr.shift();
-        const { legal_first_name, legal_last_name } = employeeObj;
-        return {
-          realName: `${legal_first_name} ${legal_last_name}`,
-          ...element,
-        };
-      }
-      return null;
-    })
-    .filter((element) => element !== null);
 
+  const timeOffUsersWithNames = employees.filter(({ id: id1 }) => timeOffUsers.some(({ employee_id: id2 }) => id2 === id1))
+  .map((element) => {
+    const { legal_first_name, legal_last_name } = element;
+    return {
+      realName: `${legal_first_name} ${legal_last_name}`,
+      ...element,
+    };
+  });
+
+
+  console.log('test new timeOffUsersWithNames',timeOffUsersWithNames)
 
   // Filter the slack absent users
 
   const humiNamesOnly = timeOffUsersWithNames.map(
     (element) => element.realName
   );
-  console.log('test 000 ', humiNamesOnly.length);
   const absentUsersList = absentUsersWithDetail.filter((element) =>
-    humiNamesOnly.includes(element.realName)
+    !humiNamesOnly.includes(element.realName)
   );
 
   // call helper func to eliminate all the user on vacation or on leave at here
-  console.log('test', absentUsersList);
-  console.log('test', absentUsersWithDetail.length);
+  console.log('test absentUsersList', absentUsersList);
+
     /* const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
      absentUsersList.map(async (user) => {
         const text = `<@${user.value}> ${message}`;
@@ -209,12 +206,28 @@ async function getHumiEmployeeTimeOffList(startDate,endDate) {
 }
 
 async function getHumiEmployeesList() {
+    let pageNumber = 1;
+    const params = new URLSearchParams(
+        {
+       'page[number]': pageNumber,
 
-  const { data } = await axios.get(
-    HUMI_API_URL + '/employees',
+     });
+    let list = [] ;
 
-    humiConfig
-  );
+    // This hack due to Humi partner API limitation, their pagination does not work.
+    // so i check the total page first
+     while(pageNumber++ < 10) {
 
-  return data.data;
+        const { data } = await axios.get(
+            HUMI_API_URL + `/employees/?page[number]=${pageNumber}`,
+            humiConfig
+          );
+           list = list.concat(data.data)
+     }
+
+
+
+
+
+  return list;
 }
