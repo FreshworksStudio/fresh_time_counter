@@ -1,7 +1,8 @@
 FROM node:14
 
 RUN apt-get update && apt-get install -y cron
-
+RUN apt update && apt install tzdata -y
+ENV TZ="America/Los_Angeles"
 # Copy cron file to the cron.d directory
 COPY crontab /etc/cron.d/cool-task
 # Give execution rights on the cron job

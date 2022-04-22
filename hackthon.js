@@ -13,7 +13,7 @@ const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
 const HUMI_API_TOKEN = process.env.HUMI_PARTNERS_API_TOKEN;
 const HUMI_API_URL = process.env.HUMI_PARTNERS_API_URL;
-
+const channelId ='C5CU14MRS';
 const startDate = moment().format('YYYY-MM-DD');
 const endDate = moment(startDate).add(2, 'days').format('YYYY-MM-DD');
 // Initializes your app with your bot token and signing secret
@@ -65,16 +65,19 @@ const expressReceiver = new ExpressReceiver({
 
   // Functions to get the employee and timeOffUsers data
   // Should be applied to the actual API data
+  console.log('humi employees', humiEmployees.length);
   const employees = humiEmployees.map((element) => {
     const employee = element['attributes'];
 
-    const { id, legal_first_name, legal_last_name, end_date } = employee;
+    const { id, first_name, last_name, end_date } = employee;
+if(id === '7df8c52a-d056-447d-891d-05ce1d8a4629' ) console.log("find desmond")
      if(end_date === null)
-    return { id, legal_first_name, legal_last_name };
+    return { id, first_name, last_name };
      else return null;
   }).filter((element) => element !== null);
 
   console.log('humi employees', employees.length);
+  ;
   const timeOffUsers = timeOffUsersList.map((element) => {
     const employee = element['attributes'];
     const { employee_id, status, start_at, end_at } = employee;
@@ -86,15 +89,15 @@ const expressReceiver = new ExpressReceiver({
 
   const timeOffUsersWithNames = employees.filter(({ id: id1 }) => timeOffUsers.some(({ employee_id: id2 }) => id2 === id1))
   .map((element) => {
-    const { legal_first_name, legal_last_name } = element;
+    const { first_name, last_name } = element;
     return {
-      realName: `${legal_first_name} ${legal_last_name}`,
+      realName: `${first_name} ${last_name}`,
       ...element,
     };
   });
 
 
-  console.log('test new timeOffUsersWithNames',timeOffUsersWithNames)
+  console.log('timeOffUsersWithNames',timeOffUsersWithNames)
 
   // Filter the slack absent users
 
@@ -104,20 +107,31 @@ const expressReceiver = new ExpressReceiver({
   const absentUsersList = absentUsersWithDetail.filter((element) =>
     !humiNamesOnly.includes(element.realName)
   );
+ const alwaysNotSendNotificationUsers = [
+      'Sam',
+      'Rohit Boolchandani',
+      'Shaun Jamieson',
+      'freshtimescounter',
 
+ ]
+ const finalAbsentUsersList = absentUsersList.filter((element) =>
+    !alwaysNotSendNotificationUsers.includes(element.realName )
+  );
   // call helper func to eliminate all the user on vacation or on leave at here
-  console.log('test absentUsersList', absentUsersList);
-
-    /* const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
-     absentUsersList.map(async (user) => {
-        const text = `<@${user.value}> ${message}`;
+  console.log('test finalAbsentUsersList', finalAbsentUsersList);
+/*
+     const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
+     finalAbsentUsersList.map(async (user) => {
+        const text = `<@${user.id}> ${message}`;
         await app.client.chat.postMessage({
           token: SLACK_BOT_TOKEN,
-          channel: user.value,
+          channel: user.id,
           text,
         });
       });
-  */
+console.log('send notification, all done);
+*/
+
 })();
 
 /** slack api */
@@ -158,22 +172,22 @@ async function getChannelUsers(channel) {
 }
 
 async function getMessages(channel) {
-  const todayDate = moment().format('YYYY-MM-DD');
+    const todayDate = moment().format('YYYY-MM-DD');
 
-  const oldest = moment(todayDate + 'T00:00:00')
-    .utc()
-    .unix();
-  const latest = moment(todayDate + 'T12:00:00')
-    .utc()
-    .unix();
+    const oldest = moment(todayDate + 'T00:00:00')
+      .utc()
+      .unix();
+    const latest = moment(todayDate + 'T18:00:00')
+      .utc()
+      .unix();
 
-  const params = {
-    token: API_TOKEN,
-    channel,
-    latest,
-    oldest,
-  };
-
+    const params = {
+      token: API_TOKEN,
+      channel,
+      latest,
+      oldest,
+    };
+    console.log(oldest, latest);
 
   const { data } = await axios.get(
     'https://slack.com/api/conversations.history',
@@ -206,7 +220,7 @@ async function getHumiEmployeeTimeOffList(startDate,endDate) {
 }
 
 async function getHumiEmployeesList() {
-    let pageNumber = 1;
+    let pageNumber = 0;
     const params = new URLSearchParams(
         {
        'page[number]': pageNumber,
