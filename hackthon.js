@@ -15,7 +15,7 @@ const HUMI_API_TOKEN = process.env.HUMI_PARTNERS_API_TOKEN;
 const HUMI_API_URL = process.env.HUMI_PARTNERS_API_URL;
 const channelId ='C5CU14MRS';
 const startDate = moment().format('YYYY-MM-DD');
-const endDate = moment(startDate).add(2, 'days').format('YYYY-MM-DD');
+const endDate = moment(startDate).add(12, 'hours').format('YYYY-MM-DD');
 // Initializes your app with your bot token and signing secret
 
 const config = {
@@ -70,7 +70,6 @@ const expressReceiver = new ExpressReceiver({
     const employee = element['attributes'];
 
     const { id, first_name, last_name, end_date } = employee;
-if(id === '7df8c52a-d056-447d-891d-05ce1d8a4629' ) console.log("find desmond")
      if(end_date === null)
     return { id, first_name, last_name };
      else return null;
@@ -107,6 +106,7 @@ if(id === '7df8c52a-d056-447d-891d-05ce1d8a4629' ) console.log("find desmond")
   const absentUsersList = absentUsersWithDetail.filter((element) =>
     !humiNamesOnly.includes(element.realName)
   );
+  // Here are C-Level manager, they do not need to check-in everyday
  const alwaysNotSendNotificationUsers = [
       'Sam',
       'Rohit Boolchandani',
@@ -119,7 +119,12 @@ if(id === '7df8c52a-d056-447d-891d-05ce1d8a4629' ) console.log("find desmond")
   );
   // call helper func to eliminate all the user on vacation or on leave at here
   console.log('test finalAbsentUsersList', finalAbsentUsersList);
-/*
+// in order to check if today is a holiday, we do a simple trick here,
+// if more than half employees does not show up, we suppose this is a holiday
+
+if(employees.length <=  finalAbsentUsersList.length * 2 ) {
+  console.log('Today is a holiday! no one is on');
+} else {
      const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
      finalAbsentUsersList.map(async (user) => {
         const text = `<@${user.id}> ${message}`;
@@ -129,8 +134,8 @@ if(id === '7df8c52a-d056-447d-891d-05ce1d8a4629' ) console.log("find desmond")
           text,
         });
       });
-console.log('send notification, all done);
-*/
+console.log('send notification, all done');
+    }
 
 })();
 
@@ -221,11 +226,6 @@ async function getHumiEmployeeTimeOffList(startDate,endDate) {
 
 async function getHumiEmployeesList() {
     let pageNumber = 0;
-    const params = new URLSearchParams(
-        {
-       'page[number]': pageNumber,
-
-     });
     let list = [] ;
 
     // This hack due to Humi partner API limitation, their pagination does not work.
