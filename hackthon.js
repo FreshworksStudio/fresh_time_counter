@@ -57,7 +57,7 @@ const expressReceiver = new ExpressReceiver({
     id: userId,
     realName: allUsersDic[userId].profile.real_name,
   }));
-
+  console.log("original absend user list", absentUsersWithDetail)
   const humiEmployees = await getHumiEmployeesList();
 
 
