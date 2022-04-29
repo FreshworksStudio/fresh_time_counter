@@ -1,6 +1,6 @@
 ## Result
 
-![](2020-04-24-12-03-41.png)
+![](img/2020-04-24-12-03-41.png)
 
 ## Deployment Steps on AWS Lightsail
 
@@ -32,21 +32,21 @@ $ docker run -d -p 8888:8888 --name freshtimes freshtimes
 #### create new app
 
 https://api.slack.com/apps
-![](2020-04-24-12-19-01.png)
+![](img/2020-04-24-12-19-01.png)
 
 - Adding scope in OAuth & Permissions
 
-![](2020-05-01-12-33-43.png)
+![](img/2020-05-01-12-33-43.png)
 
 #### slash command
 
-![](2020-04-30-11-07-47.png)
+![](img/2020-04-30-11-07-47.png)
 
-![](2020-04-30-11-08-07.png)
+![](img/2020-04-30-11-08-07.png)
 
 #### type `/fresh_time` in the channel you want to count
 
-![](2020-04-24-12-09-24.png)
+![](img/2020-04-24-12-09-24.png)
 
 ## slack api
 
@@ -62,13 +62,13 @@ https://api.slack.com/methods/conversations.history
 
 https://api.slack.com/methods/conversations.members
 
-![](2020-04-24-00-41-05.png)
+![](img/2020-04-24-00-41-05.png)
 
 ## Deploy to AWS Lightsail
 
 - open the port 8888
 
-![](2020-05-01-14-37-44.png)
+![](img/2020-05-01-14-37-44.png)
 
 ## Refs
 
@@ -95,24 +95,24 @@ SLACK_SIGNING_SECRET=  // Under Basic Information
 PORT= // whatever you want the port
 ```
 
-![](2020-12-20-18-29-55.png)
+![](img/2020-12-20-18-29-55.png)
 
-![](2020-12-20-18-32-10.png)
+![](img/2020-12-20-18-32-10.png)
 
 - Add `chat:write` to the bot scope
 
-![](2020-12-20-18-36-09.png)
+![](img/2020-12-20-18-36-09.png)
 
 - Add path `/slack/events` to `Request URL` under `Slash Commands`.
 
-![](2020-12-20-18-42-00.png)
+![](img/2020-12-20-18-42-00.png)
 
-![](2020-12-20-18-41-29.png)
+![](img/2020-12-20-18-41-29.png)
 
 - Activate `Interactive and shorcuts` and Add path `/slack/events` to `Request URL`.
-  ![](2020-12-20-18-25-56.png)
+  ![](img/2020-12-20-18-25-56.png)
 
-![](2020-12-20-18-21-21.png)
+![](img/2020-12-20-18-21-21.png)
 
 ## Refs
 

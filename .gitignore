@@ -116,3 +116,5 @@ dist
 
 ## env
 .env
+# history extension folder
+.history
