@@ -18,10 +18,7 @@ const startDate = moment().format('YYYY-MM-DD');
 const endDate = moment(startDate).add(12, 'hours').format('YYYY-MM-DD');
 // Initializes your app with your bot token and signing secret
 
-const testChannelID = "C03D6KSE1Q9";
 
-// Add statChannelID and remove testChannelID when ready for deployment
-// Format "channelID, channelID" (According to the API docs).
 
 const config = {
   headers: {
@@ -133,10 +130,10 @@ if(employees.length <=  finalAbsentUsersList.length * 2 ) {
 
     const text = `These user ${finalAbsentUsersList.map(
         (coworker) => `<@${coworker.id}>`
-      )} still no sign up after send previous notification `;
+      )} still no sign up after send previous notification. `;
       await app.client.chat.postMessage({
         token: process.env.SLACK_BOT_TOKEN,
-        channel: testChannelID,
+        channel: "C03DTDGTYTU",
         text,
       });
     console.log('send post check notification');
@@ -187,7 +184,7 @@ async function getMessages(channel) {
     const oldest = moment(todayDate + 'T00:00:00')
       .utc()
       .unix();
-    const latest = moment(todayDate + 'T18:00:00')
+    const latest = moment(todayDate + 'T19:00:00')
       .utc()
       .unix();
 

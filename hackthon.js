@@ -121,7 +121,7 @@ const expressReceiver = new ExpressReceiver({
   console.log('test finalAbsentUsersList', finalAbsentUsersList);
 // in order to check if today is a holiday, we do a simple trick here,
 // if more than half employees does not show up, we suppose this is a holiday
-/*
+
 if(employees.length <=  finalAbsentUsersList.length * 2 ) {
   console.log('Today is a holiday! no one is on');
 } else {
@@ -136,7 +136,7 @@ if(employees.length <=  finalAbsentUsersList.length * 2 ) {
       });
 console.log('send notification, all done');
     }
-*/
+
 })();
 
 /** slack api */
