@@ -18,6 +18,11 @@ const startDate = moment().format('YYYY-MM-DD');
 const endDate = moment(startDate).add(12, 'hours').format('YYYY-MM-DD');
 // Initializes your app with your bot token and signing secret
 
+const testChannelID = "C03D6KSE1Q9";
+
+// Add statChannelID and remove testChannelID when ready for deployment
+// Format "channelID, channelID" (According to the API docs).
+
 const config = {
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -121,22 +126,22 @@ const expressReceiver = new ExpressReceiver({
   console.log('test finalAbsentUsersList', finalAbsentUsersList);
 // in order to check if today is a holiday, we do a simple trick here,
 // if more than half employees does not show up, we suppose this is a holiday
-/*
+
 if(employees.length <=  finalAbsentUsersList.length * 2 ) {
   console.log('Today is a holiday! no one is on');
 } else {
-     const message = `Morning! Just checking in as I didn’t see your check in on <#${channelId}> this morning :slightly_smiling_face:`;
-     finalAbsentUsersList.map(async (user) => {
-        const text = `<@${user.id}> ${message}`;
-        await app.client.chat.postMessage({
-          token: SLACK_BOT_TOKEN,
-          channel: user.id,
-          text,
-        });
+
+    const text = `These user ${finalAbsentUsersList.map(
+        (coworker) => `<@${coworker.id}>`
+      )} still no sign up after send previous notification `;
+      await app.client.chat.postMessage({
+        token: process.env.SLACK_BOT_TOKEN,
+        channel: testChannelID,
+        text,
       });
-console.log('send notification, all done');
+    console.log('send post check notification');
     }
-*/
+
 })();
 
 /** slack api */
