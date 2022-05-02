@@ -120,7 +120,7 @@ const expressReceiver = new ExpressReceiver({
     !alwaysNotSendNotificationUsers.includes(element.realName )
   );
   // call helper func to eliminate all the user on vacation or on leave at here
-  console.log('test finalAbsentUsersList', finalAbsentUsersList);
+  console.log(' the new finalAbsentUsersList after first notification', finalAbsentUsersList);
 // in order to check if today is a holiday, we do a simple trick here,
 // if more than half employees does not show up, we suppose this is a holiday
 
