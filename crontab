@@ -1,3 +1,5 @@
+30 17 * * 1-5 /usr/local/bin/node  /usr/src/app/hackthon.js  > /proc/1/fd/1 2>/proc/1/fd/2
+30 18 * * 1-5 /usr/local/bin/node  /usr/src/app/postCheckReport.js  > /proc/1/fd/1 2>/proc/1/fd/2
+# */2 * * * * /usr/local/bin/node  /usr/src/app/postCheckReport.js  > /proc/1/fd/1 2>/proc/1/fd/2
 # */2 * * * * /usr/local/bin/node  /usr/src/app/hackthon.js  > /proc/1/fd/1 2>/proc/1/fd/2
-35 10 * * 1-5 /usr/local/bin/node  /usr/src/app/hackthon.js  > /proc/1/fd/1 2>/proc/1/fd/2
-# Mandatory blank line -- Note: deployment server is 7 hours ahead (so run at 4am)
+# Mandatory blank line -- the server is  7 hours ahead
